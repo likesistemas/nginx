@@ -1,0 +1,2 @@
+#!/bin/bash
+certbot certonly --cert-name $1 --webroot --webroot-path /var/www/letsencrypt/ -d $2
