@@ -6,5 +6,7 @@ fi;
 
 configure-nginx;
 
+dockerize -wait tcp://${HOST_PHP}:${PORTA_PHP};
+
 echo "Iniciando nginx...";
 exec nginx -c /var/www/nginx/nginx.conf -g 'daemon off;'

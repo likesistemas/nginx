@@ -1,8 +1,12 @@
 FROM nginx:latest
 
+ENV DOCKERIZE_VERSION v0.6.1
+RUN apt-get update && apt-get install -y wget \
+    && wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+
 ENV PUBLIC_HTML="/var/www/public"
-ENV AUTO_CLONE_GIT="s"
-ENV AUTO_REFRESH_GIT="s"
 
 COPY nginx.conf /var/www/nginx/
 COPY conf.d/ /var/www/nginx/conf.d/
@@ -17,4 +21,4 @@ RUN chmod +x /usr/local/bin/configure-nginx \
  && chmod +x /usr/local/bin/renewssl \
  && chmod +x /usr/local/bin/start
 
-CMD /usr/local/bin/start
+CMD start

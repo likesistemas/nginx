@@ -1,0 +1,40 @@
+version: '3'
+networks: 
+    nginx:
+        driver: bridge
+
+services:
+
+    app:
+        image: likesistemas/php:latest
+        container_name: app
+        environment:
+            - PHP_NAME=lemp
+            - PHP_PM=dynamic
+            - PHP_PM_MAX_CHILDREN=2
+            - PHP_PM_START_SERVERS=1
+            - PHP_PM_MIN_SPARE_SERVERS=1
+            - PHP_PM_MAX_SPARE_SERVERS=1
+            - PHP_PM_MAX_REQUESTS=500
+        volumes:
+            - ./www/:/var/www/public/
+        networks:
+            - nginx
+
+    nginx:
+        build: .
+        image: likesistemas/nginx:latest
+        container_name: nginx
+        environment:
+            - HOST_PHP=app
+            - PORTA_PHP=9000
+        ports:
+            - 80:80
+        volumes:
+            - ./www/:/var/www/public/
+        links:
+            - app
+        depends_on:
+            - app
+        networks:
+            - nginx
