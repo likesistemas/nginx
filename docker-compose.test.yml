@@ -7,9 +7,9 @@ services:
 
     app:
         image: likesistemas/php:latest
-        container_name: app
+        container_name: nginx_app
         environment:
-            - PHP_NAME=lemp
+            - PHP_NAME=nginx_app
             - PHP_PM=dynamic
             - PHP_PM_MAX_CHILDREN=2
             - PHP_PM_START_SERVERS=1
@@ -24,9 +24,9 @@ services:
     nginx:
         build: .
         image: likesistemas/nginx:latest
-        container_name: nginx
+        container_name: nginx_nginx
         environment:
-            - HOST_PHP=app
+            - HOST_PHP=nginx_app
             - PORTA_PHP=9000
         ports:
             - 80:80

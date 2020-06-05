@@ -20,6 +20,13 @@ jobs:
 
       - name: Run tests
         run: |
+          docker ps -a
+
+          docker stop $(docker ps -a -q)
+          docker rm $(docker ps -a -q)
+
+          docker ps -a
+
           docker-compose --file docker-compose.test.yml up --build -d
 
           CONTENT=$(curl -s "http://127.0.0.1/");
