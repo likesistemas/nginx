@@ -23,7 +23,6 @@ services:
 
     nginx:
         build: .
-        image: likesistemas/nginx:latest
         container_name: nginx_nginx
         environment:
             - HOST_PHP=nginx_app
