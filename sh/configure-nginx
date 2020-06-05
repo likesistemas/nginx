@@ -9,7 +9,7 @@ if [ -n "$LIMIT_NO_FILE" ]; then
 fi;
 
 # CONFIGURANDO HOST\PORTA PHP
-if [ -n "$PORTA_PHP" ] || [ -n "$HOST_PHP" ]; then
+if [ -n "$HOST_PHP" ]; then
 	echo "Configurando Host\Porta PHP...";
 
 	if [ -n "$EXTENSAO_PHP" ]; then	
