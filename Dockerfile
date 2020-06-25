@@ -1,6 +1,7 @@
 FROM nginx:latest
 
 ENV PORTA_PHP=9000
+ENV TIMEOUT_PHP=60s
 
 ENV DOCKERIZE_VERSION v0.6.1
 RUN apt-get update && apt-get install -y wget \
