@@ -10,12 +10,10 @@ RUN apt-get update && apt-get install -y wget \
     && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
 ENV PUBLIC_HTML="/var/www/public"
+ENV SRC_CONFIG_TEMPLATES="/var/nginx-templetes/"
+ENV SRC_CONFIG="/var/nginx/"
 
-COPY nginx.conf /var/www/nginx/
-COPY conf.d/ /var/www/nginx/conf.d/
-COPY include.d/ /var/www/nginx/include.d/
-COPY site.d/ /var/www/nginx/site.d/
-COPY ssl/ /var/www/nginx/ssl/
+COPY config/ ${SRC_CONFIG_TEMPLATES}
 
 EXPOSE 80 443
 

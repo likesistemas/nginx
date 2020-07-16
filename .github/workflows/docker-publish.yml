@@ -20,7 +20,7 @@ jobs:
 
       - name: Run tests
         run: |
-          docker-compose --file docker-compose.test.yml up --build -d
+          docker-compose up --build -d
 
           sleep 2
 
@@ -29,10 +29,24 @@ jobs:
           docker logs nginx_nginx
 
           CONTENT=$(curl -s "http://127.0.0.1/");
-          echo "CHAMADA HTTP: ${CONTENT}";
+          CONTENT_REWRITE=$(curl -s "http://127.0.0.1:81/");
+          CONTENT_TRYFILES=$(curl -s "http://127.0.0.1:82/");
+          echo "CHAMADA HTTP NORMAL: ${CONTENT}";
+          echo "CHAMADA HTTP REWRITE: ${CONTENT_REWRITE}";
+          echo "CHAMADA HTTP TRYFILES: ${CONTENT_TRYFILES}";
 
           if [ "${CONTENT}" != "php" ]; then
-            echo "Chamada HTTP retornou errado: ${CONTENT}"
+            echo "Chamada HTTP NORMAL retornou errado: ${CONTENT}"
+            exit 1;
+          fi
+
+          if [ "${CONTENT_REWRITE}" != "rewrite" ]; then
+            echo "Chamada HTTP REWRITE retornou errado: ${CONTENT_REWRITE}"
+            exit 1;
+          fi
+
+          if [ "${CONTENT_TRYFILES}" != "tryfiles" ]; then
+            echo "Chamada HTTP TRYFILES retornou errado: ${CONTENT_TRYFILES}"
             exit 1;
           fi
 

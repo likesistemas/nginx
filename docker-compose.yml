@@ -1,0 +1,77 @@
+version: '3'
+networks:
+  nginx:
+    driver: bridge
+
+services:
+
+  app:
+    image: likesistemas/php:latest
+    container_name: nginx_app
+    environment:
+      - PHP_NAME=nginx_app
+      - PHP_PM=dynamic
+      - PHP_PM_MAX_CHILDREN=2
+      - PHP_PM_START_SERVERS=1
+      - PHP_PM_MIN_SPARE_SERVERS=1
+      - PHP_PM_MAX_SPARE_SERVERS=1
+      - PHP_PM_MAX_REQUESTS=500
+    volumes:
+      - ./www/:/var/www/public/
+    networks:
+      - nginx
+
+  nginx_normal:
+    build: .
+    container_name: nginx_nginx
+    environment:
+      - HOST_PHP=nginx_app
+      - PORTA_PHP=9000
+    ports:
+      - 80:80
+    volumes:
+      - ./www/:/var/www/public/
+    links:
+      - app
+    depends_on:
+      - app
+    networks:
+      - nginx
+
+  nginx_rewrite:
+    build: .
+    container_name: nginx_rewrite
+    environment:
+      - HOST_PHP=nginx_app
+      - PORTA_PHP=9000
+      - REWRITE=1
+      - INDEX_FILE=rewrite.php
+    ports:
+      - 81:80
+    volumes:
+      - ./www/:/var/www/public/
+    links:
+      - app
+    depends_on:
+      - app
+    networks:
+      - nginx
+
+  nginx_tryfiles:
+    build: .
+    container_name: nginx_tryfiles
+    environment:
+      - HOST_PHP=nginx_app
+      - PORTA_PHP=9000
+      - TRYFILES=1
+      - INDEX_FILE=tryfiles.php
+    ports:
+      - 82:80
+    volumes:
+      - ./www/:/var/www/public/
+    links:
+      - app
+    depends_on:
+      - app
+    networks:
+      - nginx

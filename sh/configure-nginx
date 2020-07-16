@@ -1,11 +1,13 @@
 #!/bin/bash
 
-PASTA_NGINX="/var/www/nginx/";
-PASTA_NGINX_SITE=${PASTA_NGINX}/site.d;
+mkdir -p ${SRC_CONFIG}
+cp -R ${SRC_CONFIG_TEMPLATES}/. ${SRC_CONFIG}
+
+PASTA_NGINX_SITE=${SRC_CONFIG}/site.d;
 
 # CONFIGURANDO LIMITS
 if [ -n "$LIMIT_NO_FILE" ]; then
-	sed -i "s/worker_rlimit_nofile 1024;/worker_rlimit_nofile ${LIMIT_NO_FILE};/g" ${PASTA_NGINX}/nginx.conf;
+	sed -i "s/worker_rlimit_nofile 1024;/worker_rlimit_nofile ${LIMIT_NO_FILE};/g" ${SRC_CONFIG}/nginx.conf;
 fi;
 
 # CONFIGURANDO HOST\PORTA PHP
@@ -26,17 +28,24 @@ if [ -n "$HOST_PHP" ]; then
 		sed -i "s/9000/${PORTA_PHP}/g" ${PASTA_NGINX_SITE}/php.conf;
 	fi;
 
+	if [ -n "$INDEX_PHP" ]; then
+		sed -i "s/9000/${PORTA_PHP}/g" ${PASTA_NGINX_SITE}/php.conf;
+	fi;
+
 	cat ${PASTA_NGINX_SITE}/php.conf;
+fi;
+
+# INDEX FILE
+if [ -n "$INDEX_FILE" ]; then
+  sed -i "s/sistema\.php/${INDEX_FILE}/g" ${PASTA_NGINX_SITE}/tryfiles.conf;
+  sed -i "s/sistema\.php/${INDEX_FILE}/g" ${PASTA_NGINX_SITE}/rewrite.conf;
+  sed -i "s/sistema\.php/${INDEX_FILE}/g" ${PASTA_NGINX_SITE}/php.conf;
 fi;
 
 # CONFIGURANDO TRY FILES
 if [ "$TRYFILES" == "1" ]; then
 	echo "Configurando tryfiles...";
 	sed -i "12a		include site.d/tryfiles.conf;" ${PASTA_NGINX_SITE}/default.conf;
-
-	if [ -n "$TRYFILES_FILE" ]; then
-		sed -i 's/sistema.php/${TRYFILES_FILE}/g' ${PASTA_NGINX_SITE}/tryfiles.conf;
-	fi;
 
 	cat ${PASTA_NGINX_SITE}/tryfiles.conf;
 fi;
@@ -51,11 +60,7 @@ if [ "$REWRITE" == "1" ]; then
  		echo "rewrite ${REWRITE_ROLE};" >> ${PASTA_NGINX_SITE}/rewrite.conf;
 	else
 		if [ -n "$REWRITE_EXT" ]; then
-			sed -i 's/php|html/${REWRITE_EXT}/g' ${PASTA_NGINX_SITE}/rewrite.conf;
-		fi;
-
-		if [ -n "$REWRITE_FILE" ]; then
-			sed -i 's/sistema.php/${REWRITE_FILE}/g' ${PASTA_NGINX_SITE}/rewrite.conf;
+			sed -i "s/php|html/${REWRITE_EXT}/g" ${PASTA_NGINX_SITE}/rewrite.conf;
 		fi;
 	fi;
 
@@ -70,5 +75,5 @@ if [ -d "/var/www/ssl/" ]; then
 	sed -i "10a		include include.d/ssl.conf;" ${PASTA_NGINX_SITE}/default.conf;
 fi;
 
-cat ${PASTA_NGINX}/nginx.conf;
+cat ${SRC_CONFIG}/nginx.conf;
 cat ${PASTA_NGINX_SITE}/default.conf;
