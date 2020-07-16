@@ -2,12 +2,8 @@
 
 start_nginx() {
 	echo "Iniciando nginx...";
-	exec nginx -c /var/www/nginx/nginx.conf -g 'daemon off;'
+	exec nginx -c "${SRC_CONFIG}nginx.conf" -g 'daemon off;'
 }
-
-if [ -z "$PUBLIC_HTML" ]; then
-	PUBLIC_HTML="/var/www/public/";
-fi;
 
 configure-nginx;
 
