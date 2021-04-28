@@ -20,6 +20,8 @@ jobs:
 
       - name: Run tests
         run: |
+          echo "PHP_FPM_PASSWORD=123456" > .env
+
           docker-compose up --build -d
 
           sleep 2
@@ -28,7 +30,7 @@ jobs:
 
           docker logs nginx_nginx
 
-          CONTENT=$(curl -s "http://127.0.0.1/");
+          CONTENT=$(curl -s "http://127.0.0.1:83/");
           CONTENT_REWRITE=$(curl -s "http://127.0.0.1:81/");
           CONTENT_TRYFILES=$(curl -s "http://127.0.0.1:82/");
           echo "CHAMADA HTTP NORMAL: ${CONTENT}";
@@ -58,12 +60,32 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        
-      - name: Build and push Docker images
-        uses: docker/build-push-action@v1.1.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1 
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: likesistemas/nginx
-          tag_with_ref: true
-          tag_with_sha: true
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1 
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: Dockerfile
+          build-args: |
+            PHP_FPM_PASSWORD=${{ secrets.FPM_PASSWORD }}
+          push: true
+          tags: |
+            likesistemas/nginx:latest
+            ghcr.io/likesistemas/nginx:latest
+
