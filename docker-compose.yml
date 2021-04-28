@@ -22,13 +22,17 @@ services:
       - nginx
 
   nginx_normal:
-    build: .
+    image: likesistemas/nginx:latest
+    build:
+      context: .
+      args: 
+        - PHP_FPM_PASSWORD=$PHP_FPM_PASSWORD
     container_name: nginx_nginx
     environment:
       - HOST_PHP=nginx_app
       - PORTA_PHP=9000
     ports:
-      - 80:80
+      - 83:80
     volumes:
       - ./www/:/var/www/public/
     links:
@@ -39,7 +43,11 @@ services:
       - nginx
 
   nginx_rewrite:
-    build: .
+    image: likesistemas/nginx:latest
+    build:
+      context: .
+      args: 
+        - PHP_FPM_PASSWORD=$PHP_FPM_PASSWORD
     container_name: nginx_rewrite
     environment:
       - HOST_PHP=nginx_app
@@ -58,7 +66,11 @@ services:
       - nginx
 
   nginx_tryfiles:
-    build: .
+    image: likesistemas/nginx:latest
+    build:
+      context: .
+      args: 
+        - PHP_FPM_PASSWORD=$PHP_FPM_PASSWORD
     container_name: nginx_tryfiles
     environment:
       - HOST_PHP=nginx_app
