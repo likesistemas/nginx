@@ -22,7 +22,7 @@ services:
       - nginx
 
   nginx_normal:
-    image: likesistemas/nginx:latest
+    image: likesistemas/nginx:dev
     build:
       context: .
       args: 
@@ -43,7 +43,7 @@ services:
       - nginx
 
   nginx_rewrite:
-    image: likesistemas/nginx:latest
+    image: likesistemas/nginx:dev-rewrite
     build:
       context: .
       args: 
@@ -66,7 +66,7 @@ services:
       - nginx
 
   nginx_tryfiles:
-    image: likesistemas/nginx:latest
+    image: likesistemas/nginx:dev-tryfiles
     build:
       context: .
       args: 
@@ -81,6 +81,29 @@ services:
       - 82:80
     volumes:
       - ./www/:/var/www/public/
+    links:
+      - app
+    depends_on:
+      - app
+    networks:
+      - nginx
+
+  nginx_normal-extras:
+    image: likesistemas/nginx:dev-extras
+    build:
+      context: .
+      args: 
+        - PHP_FPM_PASSWORD=$PHP_FPM_PASSWORD
+    container_name: nginx_extras
+    environment:
+      - HOST_PHP=nginx_app
+      - PORTA_PHP=9000
+    ports:
+      - 84:80
+    volumes:
+      - ./www/:/var/www/public/
+      - ./.docker/nginx/conf.d/limit-requests.conf:/var/nginx/conf.d/limit-requests.conf
+      - ./.docker/nginx/site.d/extras/:/var/nginx/site.d/extras/
     links:
       - app
     depends_on:
