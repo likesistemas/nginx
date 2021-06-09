@@ -117,14 +117,14 @@ services:
       context: .
       dockerfile: Dockerfile.filebeat
       args: 
-        - FILEBEAT_NGINX_VERSION=$FILEBEAT_NGINX_VERSION
+        - FILEBEAT_NGINX_VERSION=${FILEBEAT_NGINX_VERSION:-latest}
     container_name: nginx_filebeat
     environment:
       - HOST_PHP=nginx_app
       - PORTA_PHP=9000
       - TRYFILES=1
       - INDEX_FILE=tryfiles.php
-      - FILEBEAT_SETUP=${FILEBEAT_SETUP}
+      - FILEBEAT_SETUP=${FILEBEAT_SETUP:-false}
       - FILEBEAT_CLOUD_ID=${FILEBEAT_CLOUD_ID}
       - FILEBEAT_CLOUD_AUTH=${FILEBEAT_CLOUD_AUTH}
     ports:
