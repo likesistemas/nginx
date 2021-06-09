@@ -4,7 +4,10 @@ import { Counter } from 'k6/metrics';
 
 export const requests = new Counter('http_reqs');
 
-export const urlbase = __ENV.URL != null ? __ENV.URL : "http://127.0.0.1:83/";
+export const port = __ENV.PORT != null ? __ENV.PORT : "83"
+export const urlbase = __ENV.URL != null ? __ENV.URL : "http://127.0.0.1:" + port + "/";
+export const body_is = __ENV.BODY != null ? __ENV.BODY : "php";
+export const path = __ENV.PATH != null ? __ENV.PATH : '';
 
 export const options = {
   thresholds: {
@@ -20,9 +23,9 @@ export default function () {
         return false;
       }
 
-      return r.body.indexOf('php') !== -1;
+      return r.body.indexOf(body_is) !== -1;
     },
   };
 
-  check(http.get(urlbase + ''), ok);
+  check(http.get(urlbase + path), ok);
 }

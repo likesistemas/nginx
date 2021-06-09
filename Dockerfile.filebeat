@@ -1,0 +1,20 @@
+ARG FILEBEAT_NGINX_VERSION=latest
+
+FROM likesistemas/nginx:${FILEBEAT_NGINX_VERSION}
+
+RUN rm -f /var/log/nginx/access.log \
+ && rm -f /var/log/nginx/error.log
+
+ENV FILEBEAT_VERSION=7.13.1
+ENV FILEBEAT_SETUP=false
+
+RUN curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${FILEBEAT_VERSION}-amd64.deb && \
+    dpkg -i filebeat-${FILEBEAT_VERSION}-amd64.deb
+
+COPY filebeat/config.yml /etc/filebeat/filebeat.yml
+COPY filebeat/start.sh /usr/local/bin/start-filebeat
+COPY filebeat/logs.conf ${SRC_CONFIG_TEMPLATES}conf.d/logs.conf
+
+RUN chmod +x /usr/local/bin/start-filebeat
+RUN chmod go-w /etc/filebeat/filebeat.yml
+ENTRYPOINT ["start-filebeat"]

@@ -6,6 +6,7 @@ start_nginx() {
 }
 
 configure-nginx;
+/docker-entrypoint.sh
 
 if [ -n "$HOST_PHP" ]; then
 	dockerize \
