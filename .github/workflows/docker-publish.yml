@@ -89,3 +89,12 @@ jobs:
             likesistemas/nginx:latest
             ghcr.io/likesistemas/nginx:latest
 
+      - name: Build and push with filebeat
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: Dockerfile.filebeat
+          push: true
+          tags: |
+            likesistemas/nginx:filebeat
+            ghcr.io/likesistemas/nginx:filebeat
