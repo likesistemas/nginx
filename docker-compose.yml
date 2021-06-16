@@ -137,3 +137,53 @@ services:
       - app
     networks:
       - nginx
+  
+  nginx_filebeat:
+    image: likesistemas/nginx:dev-filebeat
+    build:
+      context: .
+      dockerfile: Dockerfile.filebeat
+      args: 
+        - FILEBEAT_NGINX_VERSION=${FILEBEAT_NGINX_VERSION:-latest}
+    container_name: nginx_filebeat
+    environment:
+      - HOST_PHP=nginx_app
+      - PORTA_PHP=9000
+      - TRYFILES=1
+      - INDEX_FILE=tryfiles.php
+      - FILEBEAT_SETUP=${FILEBEAT_SETUP:-false}
+      - FILEBEAT_CLOUD_ID=${FILEBEAT_CLOUD_ID}
+      - FILEBEAT_CLOUD_AUTH=${FILEBEAT_CLOUD_AUTH}
+    ports:
+      - 85:80
+    volumes:
+      - ./www/:/var/www/public/
+    links:
+      - app
+    depends_on:
+      - app
+    networks:
+      - nginx
+
+  nginx_realip:
+    image: likesistemas/nginx:dev-realip
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nginx_realip
+    environment:
+      - HOST_PHP=nginx_app
+      - PORTA_PHP=9000
+      - TRYFILES=1
+      - INDEX_FILE=tryfiles.php
+      - REALIP_FROM=10.0.0.0/16
+    ports:
+      - 86:80
+    volumes:
+      - ./www/:/var/www/public/
+    links:
+      - app
+    depends_on:
+      - app
+    networks:
+      - nginx

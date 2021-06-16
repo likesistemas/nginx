@@ -4,6 +4,7 @@ mkdir -p ${SRC_CONFIG}
 cp -R ${SRC_CONFIG_TEMPLATES}/. ${SRC_CONFIG}
 
 PASTA_NGINX_SITE=${SRC_CONFIG}/site.d;
+PASTA_NGINX_CONF=${SRC_CONFIG}/conf.d;
 
 # CONFIGURANDO LIMITS
 if [ -n "$LIMIT_NO_FILE" ]; then
@@ -68,12 +69,18 @@ if [ "$REWRITE" == "1" ]; then
 fi;
 
 # CONFIGURANDO SSL
-echo "Configurando SSL...";
-SSL_FILE=${PASTA_NGINX_SITE}/ssl.conf;
-
 if [ -d "/var/www/ssl/" ]; then
+	echo "Configurando SSL...";
 	sed -i "10a		include include.d/ssl.conf;" ${PASTA_NGINX_SITE}/default.conf;
 fi;
+
+# CONFIGURANDO PARA ELB
+if [ -n "$REALIP_FROM" ]; then
+	echo "Configurando Real IP...";
+	REALIP_FROM_CONFIG=${PASTA_NGINX_CONF}/realip.conf
+	echo "real_ip_header X-Forwarded-For;" >> $REALIP_FROM_CONFIG
+	echo "set_real_ip_from ${REALIP_FROM};" >> $REALIP_FROM_CONFIG
+fi
 
 cat ${SRC_CONFIG}/nginx.conf;
 cat ${PASTA_NGINX_SITE}/default.conf;
