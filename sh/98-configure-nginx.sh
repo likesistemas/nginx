@@ -1,14 +1,25 @@
 #!/bin/bash
 
 mkdir -p ${SRC_CONFIG}
-cp -R ${SRC_CONFIG_TEMPLATES}/. ${SRC_CONFIG}
+cp -R ${SRC_TEMPLATES}/. ${SRC_CONFIG}
 
 PASTA_NGINX_SITE=${SRC_CONFIG}/site.d;
 PASTA_NGINX_CONF=${SRC_CONFIG}/conf.d;
 PASTA_NGINX_INCLUDE=${SRC_CONFIG}/include.d;
 
+if [ -d "/var/nginx/conf.d/" ]; then
+	echo "Copiando config extras...";
+	cp -Rv /var/nginx/conf.d/*.conf ${PASTA_NGINX_CONF}
+fi;
+
+if [ -d "/var/nginx/site.d/extras/" ]; then
+	echo "Copiando config site.d extras...";
+	cp -Rv /var/nginx/site.d/extras/*.conf ${PASTA_NGINX_SITE}/extras/
+fi;
+
 # CONFIGURANDO LIMITS
 if [ -n "$LIMIT_NO_FILE" ]; then
+	echo "Configurando Limits '${LIMIT_NO_FILE}'...";
 	sed -i "s/worker_rlimit_nofile 1024;/worker_rlimit_nofile ${LIMIT_NO_FILE};/g" ${SRC_CONFIG}/nginx.conf;
 fi;
 

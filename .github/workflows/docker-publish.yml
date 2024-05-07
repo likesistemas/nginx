@@ -16,39 +16,67 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Run tests
+      - name: Up environment
         run: |
           echo "PHP_FPM_PASSWORD=123456" > .env
+          docker compose up --build -d
 
-          docker-compose up --build -d
+      - name: Wait environment
+        run: |
+          sleep 10
 
-          sleep 2
+      - name: Logs environment
+        run: |
+          docker compose ps
+          docker compose logs
 
-          docker ps -a
-
-          docker logs nginx_nginx
-
+      - name: Test Normal
+        run: |
           CONTENT=$(curl -s "http://127.0.0.1:83/");
-          CONTENT_REWRITE=$(curl -s "http://127.0.0.1:81/");
-          CONTENT_TRYFILES=$(curl -s "http://127.0.0.1:82/");
           echo "CHAMADA HTTP NORMAL: ${CONTENT}";
-          echo "CHAMADA HTTP REWRITE: ${CONTENT_REWRITE}";
-          echo "CHAMADA HTTP TRYFILES: ${CONTENT_TRYFILES}";
-
           if [ "${CONTENT}" != "php" ]; then
             echo "Chamada HTTP NORMAL retornou errado: ${CONTENT}"
             exit 1;
           fi
 
+      - name: Test Rewrite
+        run: |
+          CONTENT_REWRITE=$(curl -s "http://127.0.0.1:81/");
+          echo "CHAMADA HTTP REWRITE: ${CONTENT_REWRITE}";
           if [ "${CONTENT_REWRITE}" != "rewrite" ]; then
             echo "Chamada HTTP REWRITE retornou errado: ${CONTENT_REWRITE}"
             exit 1;
           fi
 
+      - name: Test Tryfiles
+        run: |  
+          CONTENT_TRYFILES=$(curl -s "http://127.0.0.1:82/");
+          echo "CHAMADA HTTP TRYFILES: ${CONTENT_TRYFILES}";
+
           if [ "${CONTENT_TRYFILES}" != "tryfiles" ]; then
             echo "Chamada HTTP TRYFILES retornou errado: ${CONTENT_TRYFILES}"
+            exit 1;
+          fi
+
+      - name: Test Extras
+        run: |  
+          CONTENT=$(curl -s -o /dev/null -I -w "%{content_type}" http://127.0.0.1:84/zzz);
+          echo "CHAMADA HTTP: ${CONTENT}";
+
+          if [ "${CONTENT}" != "image/gif" ]; then
+            echo "Chamada HTTP retornou errado: ${CONTENT}"
+            exit 1;
+          fi
+
+      - name: Test Extras var
+        run: |  
+          CONTENT=$(curl -s -o /dev/null -I -w "%{content_type}" http://127.0.0.1:89/zzz);
+          echo "CHAMADA HTTP: ${CONTENT}";
+
+          if [ "${CONTENT}" != "image/gif" ]; then
+            echo "Chamada HTTP retornou errado: ${CONTENT}"
             exit 1;
           fi
 
@@ -59,7 +87,7 @@ jobs:
     if: github.event_name == 'push'
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
