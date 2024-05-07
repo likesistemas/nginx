@@ -17,21 +17,19 @@ RUN apt-get update && apt-get install -y wget \
     && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
 ENV PUBLIC_HTML="/var/www/public"
-ENV SRC_CONFIG_TEMPLATES="/var/nginx-templetes/"
-ENV SRC_CONFIG="/var/nginx/"
+ENV SRC_TEMPLATES="/etc/nginx-templetes/"
+ENV SRC_CONFIG="/etc/nginx/"
 
-COPY config/ ${SRC_CONFIG_TEMPLATES}
+RUN rm -Rf /etc/nginx/conf.d/
+COPY config/ ${SRC_TEMPLATES}
 
-COPY --from=htpasswd /fpm_passwd /var/nginx/fpm_passwd
+COPY --from=htpasswd /fpm_passwd /etc/nginx/fpm_passwd
 COPY www/fpm_status.html /var/php/status.html
 
 EXPOSE 80 443
 
-COPY sh/ /usr/local/bin/
-RUN chmod +x /usr/local/bin/configure-nginx \
- && chmod +x /usr/local/bin/renewssl \
- && chmod +x /usr/local/bin/start
+COPY sh/ /docker-entrypoint.d/
+RUN chmod +x /docker-entrypoint.d/*-configure-nginx.sh \
+ && chmod +x /docker-entrypoint.d/*-wait-php.sh
 
 WORKDIR $PUBLIC_HTML
-
-CMD start

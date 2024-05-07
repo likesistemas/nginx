@@ -8,6 +8,7 @@ services:
   app:
     image: likesistemas/php:latest
     container_name: nginx_app
+    command: sleep 4
     environment:
       - PHP_NAME=nginx_app
       - PHP_PM=dynamic
@@ -26,7 +27,7 @@ services:
     build:
       context: .
       args: 
-        - PHP_FPM_PASSWORD=$PHP_FPM_PASSWORD
+        - PHP_FPM_PASSWORD=${PHP_FPM_PASSWORD:-password}
     container_name: nginx_nginx
     environment:
       - HOST_PHP=nginx_app
@@ -42,12 +43,31 @@ services:
     networks:
       - nginx
 
+  nginx_timeout:
+    image: likesistemas/nginx:dev
+    build:
+      context: .
+      args: 
+        - PHP_FPM_PASSWORD=${PHP_FPM_PASSWORD:-password}
+    container_name: nginx_timeout
+    restart: always
+    environment:
+      - HOST_PHP=nginx_app
+      - PORTA_PHP=9000
+      - TIMEOUT_PHP=2s
+    ports:
+      - 88:80
+    volumes:
+      - ./www/:/var/www/public/
+    networks:
+      - nginx
+
   nginx_rewrite:
     image: likesistemas/nginx:dev-rewrite
     build:
       context: .
       args: 
-        - PHP_FPM_PASSWORD=$PHP_FPM_PASSWORD
+        - PHP_FPM_PASSWORD=${PHP_FPM_PASSWORD:-password}
     container_name: nginx_rewrite
     environment:
       - HOST_PHP=nginx_app
@@ -70,7 +90,7 @@ services:
     build:
       context: .
       args: 
-        - PHP_FPM_PASSWORD=$PHP_FPM_PASSWORD
+        - PHP_FPM_PASSWORD=${PHP_FPM_PASSWORD:-password}
     container_name: nginx_tryfiles
     environment:
       - HOST_PHP=nginx_app
@@ -93,13 +113,36 @@ services:
     build:
       context: .
       args: 
-        - PHP_FPM_PASSWORD=$PHP_FPM_PASSWORD
+        - PHP_FPM_PASSWORD=${PHP_FPM_PASSWORD:-password}
     container_name: nginx_extras
     environment:
       - HOST_PHP=nginx_app
       - PORTA_PHP=9000
     ports:
       - 84:80
+    volumes:
+      - ./www/:/var/www/public/
+      - ./.docker/nginx/conf.d/limit-requests.conf:/etc/nginx/conf.d/limit-requests.conf
+      - ./.docker/nginx/site.d/extras/:/etc/nginx/site.d/extras/
+    links:
+      - app
+    depends_on:
+      - app
+    networks:
+      - nginx
+
+  nginx_normal-extras-var:
+    image: likesistemas/nginx:dev-extras
+    build:
+      context: .
+      args: 
+        - PHP_FPM_PASSWORD=${PHP_FPM_PASSWORD:-password}
+    container_name: nginx_extras2
+    environment:
+      - HOST_PHP=nginx_app
+      - PORTA_PHP=9000
+    ports:
+      - 89:80
     volumes:
       - ./www/:/var/www/public/
       - ./.docker/nginx/conf.d/limit-requests.conf:/var/nginx/conf.d/limit-requests.conf
@@ -137,15 +180,15 @@ services:
       - app
     networks:
       - nginx
-  
-  nginx_filebeat:
+
+  nginx_filebeat2:
     image: likesistemas/nginx:dev-filebeat
     build:
       context: .
       dockerfile: Dockerfile.filebeat
       args: 
         - FILEBEAT_NGINX_VERSION=${FILEBEAT_NGINX_VERSION:-latest}
-    container_name: nginx_filebeat
+    container_name: nginx_filebeat2
     environment:
       - HOST_PHP=nginx_app
       - PORTA_PHP=9000
@@ -155,7 +198,7 @@ services:
       - FILEBEAT_CLOUD_ID=${FILEBEAT_CLOUD_ID}
       - FILEBEAT_CLOUD_AUTH=${FILEBEAT_CLOUD_AUTH}
     ports:
-      - 85:80
+      - 87:80
     volumes:
       - ./www/:/var/www/public/
     links:
