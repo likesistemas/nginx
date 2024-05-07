@@ -27,13 +27,13 @@ services:
     build:
       context: .
       args: 
-        - PHP_FPM_PASSWORD=$PHP_FPM_PASSWORD
+        - PHP_FPM_PASSWORD=${PHP_FPM_PASSWORD:-password}
     container_name: nginx_nginx
     environment:
       - HOST_PHP=nginx_app
       - PORTA_PHP=9000
     ports:
-      - 88:80
+      - 83:80
     volumes:
       - ./www/:/var/www/public/
     links:
@@ -48,7 +48,7 @@ services:
     build:
       context: .
       args: 
-        - PHP_FPM_PASSWORD=$PHP_FPM_PASSWORD
+        - PHP_FPM_PASSWORD=${PHP_FPM_PASSWORD:-password}
     container_name: nginx_timeout
     restart: always
     environment:
@@ -56,7 +56,7 @@ services:
       - PORTA_PHP=9000
       - TIMEOUT_PHP=2s
     ports:
-      - 83:80
+      - 88:80
     volumes:
       - ./www/:/var/www/public/
     networks:
@@ -67,7 +67,7 @@ services:
     build:
       context: .
       args: 
-        - PHP_FPM_PASSWORD=$PHP_FPM_PASSWORD
+        - PHP_FPM_PASSWORD=${PHP_FPM_PASSWORD:-password}
     container_name: nginx_rewrite
     environment:
       - HOST_PHP=nginx_app
@@ -90,7 +90,7 @@ services:
     build:
       context: .
       args: 
-        - PHP_FPM_PASSWORD=$PHP_FPM_PASSWORD
+        - PHP_FPM_PASSWORD=${PHP_FPM_PASSWORD:-password}
     container_name: nginx_tryfiles
     environment:
       - HOST_PHP=nginx_app
@@ -113,7 +113,7 @@ services:
     build:
       context: .
       args: 
-        - PHP_FPM_PASSWORD=$PHP_FPM_PASSWORD
+        - PHP_FPM_PASSWORD=${PHP_FPM_PASSWORD:-password}
     container_name: nginx_extras
     environment:
       - HOST_PHP=nginx_app
@@ -122,8 +122,8 @@ services:
       - 84:80
     volumes:
       - ./www/:/var/www/public/
-      - ./.docker/nginx/conf.d/limit-requests.conf:/var/nginx/conf.d/limit-requests.conf
-      - ./.docker/nginx/site.d/extras/:/var/nginx/site.d/extras/
+      - ./.docker/nginx/conf.d/limit-requests.conf:/etc/nginx/conf.d/limit-requests.conf
+      - ./.docker/nginx/site.d/extras/:/etc/nginx/site.d/extras/
     links:
       - app
     depends_on:

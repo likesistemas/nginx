@@ -1,7 +1,7 @@
 #!/bin/bash
 
 mkdir -p ${SRC_CONFIG}
-cp -R ${SRC_CONFIG_TEMPLATES}/. ${SRC_CONFIG}
+cp -R ${SRC_TEMPLATES}/. ${SRC_CONFIG}
 
 PASTA_NGINX_SITE=${SRC_CONFIG}/site.d;
 PASTA_NGINX_CONF=${SRC_CONFIG}/conf.d;
