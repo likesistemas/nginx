@@ -60,6 +60,26 @@ jobs:
             exit 1;
           fi
 
+      - name: Test Extras
+        run: |  
+          CONTENT=$(curl -s -o /dev/null -I -w "%{content_type}" http://127.0.0.1:84/zzz);
+          echo "CHAMADA HTTP: ${CONTENT}";
+
+          if [ "${CONTENT}" != "image/gif" ]; then
+            echo "Chamada HTTP retornou errado: ${CONTENT}"
+            exit 1;
+          fi
+
+      - name: Test Extras var
+        run: |  
+          CONTENT=$(curl -s -o /dev/null -I -w "%{content_type}" http://127.0.0.1:89/zzz);
+          echo "CHAMADA HTTP: ${CONTENT}";
+
+          if [ "${CONTENT}" != "image/gif" ]; then
+            echo "Chamada HTTP retornou errado: ${CONTENT}"
+            exit 1;
+          fi
+
   push:
     needs: test
 

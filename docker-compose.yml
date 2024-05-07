@@ -131,6 +131,29 @@ services:
     networks:
       - nginx
 
+  nginx_normal-extras-var:
+    image: likesistemas/nginx:dev-extras
+    build:
+      context: .
+      args: 
+        - PHP_FPM_PASSWORD=${PHP_FPM_PASSWORD:-password}
+    container_name: nginx_extras2
+    environment:
+      - HOST_PHP=nginx_app
+      - PORTA_PHP=9000
+    ports:
+      - 89:80
+    volumes:
+      - ./www/:/var/www/public/
+      - ./.docker/nginx/conf.d/limit-requests.conf:/var/nginx/conf.d/limit-requests.conf
+      - ./.docker/nginx/site.d/extras/:/var/nginx/site.d/extras/
+    links:
+      - app
+    depends_on:
+      - app
+    networks:
+      - nginx
+
   nginx_filebeat:
     image: likesistemas/nginx:dev-filebeat
     build:
