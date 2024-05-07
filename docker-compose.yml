@@ -8,6 +8,7 @@ services:
   app:
     image: likesistemas/php:latest
     container_name: nginx_app
+    command: sleep 4
     environment:
       - PHP_NAME=nginx_app
       - PHP_PM=dynamic
@@ -39,6 +40,25 @@ services:
       - app
     depends_on:
       - app
+    networks:
+      - nginx
+
+  nginx_timeout:
+    image: likesistemas/nginx:dev
+    build:
+      context: .
+      args: 
+        - PHP_FPM_PASSWORD=$PHP_FPM_PASSWORD
+    container_name: nginx_timeout
+    restart: always
+    environment:
+      - HOST_PHP=nginx_app
+      - PORTA_PHP=9000
+      - TIMEOUT_PHP=2s
+    ports:
+      - 83:80
+    volumes:
+      - ./www/:/var/www/public/
     networks:
       - nginx
 
@@ -137,8 +157,8 @@ services:
       - app
     networks:
       - nginx
-  
-  nginx_filebeat:
+
+  nginx_filebeat2:
     image: likesistemas/nginx:dev-filebeat
     build:
       context: .
