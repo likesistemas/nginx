@@ -27,11 +27,8 @@ COPY www/fpm_status.html /var/php/status.html
 
 EXPOSE 80 443
 
-COPY sh/ /usr/local/bin/
-RUN chmod +x /usr/local/bin/configure-nginx \
- && chmod +x /usr/local/bin/renewssl \
- && chmod +x /usr/local/bin/start
+COPY sh/ /docker-entrypoint.d/
+RUN chmod +x /docker-entrypoint.d/01-configure-nginx.sh \
+ && chmod +x /docker-entrypoint.d/02-wait-php.sh
 
 WORKDIR $PUBLIC_HTML
-
-CMD start
