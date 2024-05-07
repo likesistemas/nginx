@@ -33,7 +33,7 @@ services:
       - HOST_PHP=nginx_app
       - PORTA_PHP=9000
     ports:
-      - 83:80
+      - 88:80
     volumes:
       - ./www/:/var/www/public/
     links:
@@ -165,7 +165,7 @@ services:
       dockerfile: Dockerfile.filebeat
       args: 
         - FILEBEAT_NGINX_VERSION=${FILEBEAT_NGINX_VERSION:-latest}
-    container_name: nginx_filebeat
+    container_name: nginx_filebeat2
     environment:
       - HOST_PHP=nginx_app
       - PORTA_PHP=9000
@@ -175,7 +175,7 @@ services:
       - FILEBEAT_CLOUD_ID=${FILEBEAT_CLOUD_ID}
       - FILEBEAT_CLOUD_AUTH=${FILEBEAT_CLOUD_AUTH}
     ports:
-      - 85:80
+      - 87:80
     volumes:
       - ./www/:/var/www/public/
     links:
