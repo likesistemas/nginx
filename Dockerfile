@@ -17,11 +17,11 @@ RUN apt-get update && apt-get install -y wget \
     && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
 ENV PUBLIC_HTML="/var/www/public"
-ENV SRC_TEMPLATES="/etc/nginx-templetes/"
+ENV SRC_CONFIG_TEMPLATES="/etc/nginx-templetes/"
 ENV SRC_CONFIG="/etc/nginx/"
 
 RUN rm -Rf /etc/nginx/conf.d/
-COPY config/ ${SRC_TEMPLATES}
+COPY config/ ${SRC_CONFIG_TEMPLATES}
 
 COPY --from=htpasswd /fpm_passwd /etc/nginx/fpm_passwd
 COPY www/fpm_status.html /var/php/status.html

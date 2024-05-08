@@ -80,6 +80,16 @@ jobs:
             exit 1;
           fi
 
+      - name: Test Filebeat
+        run: |
+          CONTENT=$(curl -s "http://127.0.0.1:85/");
+          echo "CHAMADA HTTP TRYFILES: ${CONTENT}";
+
+          if [ "${CONTENT}" != "tryfiles" ]; then
+            echo "Chamada HTTP TRYFILES retornou errado: ${CONTENT}"
+            exit 1;
+          fi
+
   push:
     needs: test
 
