@@ -90,6 +90,22 @@ jobs:
             exit 1;
           fi
 
+      - name: Setup SSL
+        run: |
+          echo "PHP_FPM_PASSWORD=123456" > .env
+          docker compose -f docker-compose.ssl.yml up --build -d
+          sleep 10
+
+      - name: Test SSL
+        run: |
+          CONTENT=$(curl -s "https://127.0.0.1:444/");
+          echo "CHAMADA HTTP: ${CONTENT}";
+
+          if [ "${CONTENT}" != "php" ]; then
+            echo "Chamada HTTP retornou errado: ${CONTENT}"
+            exit 1;
+          fi
+
   push:
     needs: test
 
