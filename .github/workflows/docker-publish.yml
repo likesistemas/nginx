@@ -90,6 +90,28 @@ jobs:
             exit 1;
           fi
 
+      - name: Down environment
+        run: |
+          docker compose down --remove-orphans
+
+      - name: Setup SSL
+        run: |
+          echo "PHP_FPM_PASSWORD=123456" > .env
+          docker compose -f docker-compose.ssl.yml up --build -d
+          sleep 10
+          docker compose -f docker-compose.ssl.yml ps
+          docker compose -f docker-compose.ssl.yml logs
+
+      - name: Test SSL
+        run: |
+          CONTENT=$(curl -s -k "https://localhost:444/");
+          echo "CHAMADA HTTP: ${CONTENT}";
+
+          if [ "${CONTENT}" != "php" ]; then
+            echo "Chamada HTTP retornou errado: ${CONTENT}"
+            exit 1;
+          fi
+
   push:
     needs: test
 

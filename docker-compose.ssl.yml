@@ -1,0 +1,34 @@
+networks:
+  nginx:
+    driver: bridge
+
+services:
+
+  app:
+    image: likesistemas/php:latest
+    volumes:
+      - ./www/:/var/www/public/
+    networks:
+      - nginx
+
+  nginx:
+    image: likesistemas/nginx:dev
+    build:
+      context: .
+      args: 
+        - PHP_FPM_PASSWORD=${PHP_FPM_PASSWORD:-password}
+    environment:
+      - HOST_PHP=app
+      - PORTA_PHP=9000
+      - SSL=true
+    ports:
+      - 444:443
+    volumes:
+      - ./www/:/var/www/public/
+      - ./.docker/ssl/:/var/www/ssl/
+    links:
+      - app
+    depends_on:
+      - app
+    networks:
+      - nginx
