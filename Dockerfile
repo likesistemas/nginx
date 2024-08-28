@@ -1,4 +1,4 @@
-FROM debian:10-slim as htpasswd
+FROM debian:10-slim AS htpasswd
 WORKDIR /
 ARG PHP_FPM_PASSWORD=123456
 RUN apt update && apt install apache2-utils -y

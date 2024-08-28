@@ -83,7 +83,7 @@ fi;
 # CONFIGURANDO SSL
 if [ -d "/var/www/ssl/" ]; then
 	echo "Configurando SSL...";
-	sed -i "10a		include include.d/ssl.conf;" ${PASTA_NGINX_SITE}/default.conf;
+	sed -i "10a		include site.d/ssl.conf;" ${PASTA_NGINX_SITE}/default.conf;
 fi;
 
 # CONFIGURANDO PARA ELB
@@ -103,7 +103,7 @@ fi;
 
 if [ -z "$HTTPS_IPV6" ] || [ "$HTTPS_IPV6" == "true" ]; then
 	echo "Habilitando IPV6 do HTTPS";
-	echo "listen [::]:443 ssl http2;" >> ${PASTA_NGINX_INCLUDE}/ssl.conf;
+	echo "listen [::]:443 ssl;" >> ${PASTA_NGINX_INCLUDE}/ssl.conf;
 
 	cat ${PASTA_NGINX_INCLUDE}/ssl.conf;
 fi;
