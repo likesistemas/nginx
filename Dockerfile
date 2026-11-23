@@ -1,6 +1,6 @@
 FROM debian:10-slim AS ssl
 WORKDIR /ssl/
-RUN apt update && apt-get install -y libnss3-tools curl
+RUN apt-get update && apt-get install -y libnss3-tools curl
 RUN curl -JLO "https://dl.filippo.io/mkcert/latest?for=linux/amd64"
 RUN chmod +x mkcert-v*-linux-amd64
 RUN mv mkcert-v*-linux-amd64 /usr/local/bin/mkcert
@@ -9,7 +9,7 @@ RUN mkcert -key-file privkey.pem -cert-file fullchain.pem localhost 127.0.0.1 ::
 FROM debian:10-slim AS htpasswd
 WORKDIR /
 ARG PHP_FPM_PASSWORD=123456
-RUN apt update && apt install apache2-utils -y
+RUN apt-get update && apt-get install apache2-utils -y
 RUN htpasswd -bc fpm_passwd admin $PHP_FPM_PASSWORD
 RUN htpasswd -bv fpm_passwd admin $PHP_FPM_PASSWORD
 
