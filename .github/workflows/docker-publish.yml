@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Up environment
         run: |
@@ -116,13 +116,16 @@ jobs:
     needs: test
 
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: >-
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.head.repo.full_name == github.repository)
     permissions:
       contents: read
       packages: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -132,13 +135,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
         uses: docker/build-push-action@v2
@@ -149,8 +145,7 @@ jobs:
             PHP_FPM_PASSWORD=${{ secrets.FPM_PASSWORD }}
           push: true
           tags: |
-            likesistemas/nginx:latest
-            ghcr.io/likesistemas/nginx:latest
+            ${{ github.event_name == 'pull_request' && format('likesistemas/nginx:pr{0}', github.event.pull_request.number) || 'likesistemas/nginx:latest' }}
 
       - name: Build and push with filebeat
         uses: docker/build-push-action@v2
@@ -159,5 +154,4 @@ jobs:
           file: Dockerfile.filebeat
           push: true
           tags: |
-            likesistemas/nginx:filebeat
-            ghcr.io/likesistemas/nginx:filebeat
+            ${{ github.event_name == 'pull_request' && format('likesistemas/nginx:filebeat-pr{0}', github.event.pull_request.number) || 'likesistemas/nginx:filebeat' }}
